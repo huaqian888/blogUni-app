@@ -15,4 +15,7 @@ onHide(() => {
 @import "./wxcomponents/colorui/icon.css";
 @import "./wxcomponents/colorui/animation.css";
 @import "./wxcomponents/vant/common/index.wxss";
+page {
+  background-color: #f0f0f0;
+}
 </style>

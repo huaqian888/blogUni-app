@@ -1,19 +1,13 @@
 {
-	"pages": [
-		{
-			"path": "pages/index/index",
-			"style": {
-				"navigationBarTitleText": "uni-app"
-			}
-		}
-	],
 	"globalStyle": {
-		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8",
+		"navigationBarBackgroundColor": "#19b5fe",
+		"navigationBarTextStyle": "white",
 		"usingComponents": {
+			"towxml": "/wxcomponents/towxml/towxml",
+			"custom-tab-bar": "./components/custom-tab-bar/index",
 			"van-button": "./wxcomponents/vant/button/index",
+			"van-uploader": "./wxcomponents/vant/uploader/index",
+			"van-action-sheet": "./wxcomponents/vant/action-sheet/index",
 			"van-card": "./wxcomponents/vant/card/index",
 			"van-cell": "./wxcomponents/vant/cell/index",
 			"van-cell-group": "./wxcomponents/vant/cell-group/index",
@@ -26,6 +20,7 @@
 			"van-goods-action-icon": "./wxcomponents/vant/goods-action-icon/index",
 			"van-goods-action-button": "./wxcomponents/vant/goods-action-button/index",
 			"van-icon": "./wxcomponents/vant/icon/index",
+			"van-image": "./wxcomponents/vant/image/index",
 			"van-loading": "./wxcomponents/vant/loading/index",
 			"van-nav-bar": "./wxcomponents/vant/nav-bar/index",
 			"van-notice-bar": "./wxcomponents/vant/notice-bar/index",
@@ -55,7 +50,80 @@
 			"van-rate": "./wxcomponents/vant/rate/index",
 			"van-collapse": "./wxcomponents/vant/collapse/index",
 			"van-collapse-item": "./wxcomponents/vant/collapse-item/index",
-			"van-picker": "./wxcomponents/vant/picker/index"
+			"van-picker": "./wxcomponents/vant/picker/index",
+			"van-skeleton": "./wxcomponents/vant/skeleton/index"
 		}
+	},
+	"root": "pages",
+	"pages": [
+		{
+			"path": "pages/blog/index",
+			"style": {
+				"navigationBarTitleText": "花堑Blog",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/twitter/index",
+			"style": {
+				"navigationBarTitleText": "说说",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/noticeBoard/index",
+			"style": {
+				"navigationBarTitleText": "留言板",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/blogDetail/index",
+			"style": {
+				"navigationBarTitleText": "博客详情"
+			}
+		},
+		{
+			"path": "pages/personal/index",
+			"style": {
+				"navigationBarTitleText": "我"
+			}
+		},
+		{
+			"path": "pages/personal/components/login",
+			"style": {
+				"navigationBarTitleText": "登录页"
+			}
+		},
+		{
+			"path": "pages/personal/components/updateBase",
+			"style": {
+				"navigationBarTitleText": "修改个人信息"
+			}
+		}
+	],
+	"tabBar": {
+		"custom": true,
+		"color": "#000000",
+		"selectedColor": "#000000",
+		"backgroundColor": "#000000",
+		"list": [
+			{
+				"pagePath": "pages/blog/index",
+				"text": "花堑Blog"
+			},
+			{
+				"pagePath": "pages/noticeBoard/index",
+				"text": "留言板"
+			},
+			{
+				"pagePath": "pages/twitter/index",
+				"text": "说说"
+			},
+			{
+				"pagePath": "pages/personal/index",
+				"text": "我"
+			}
+		]
 	}
 }

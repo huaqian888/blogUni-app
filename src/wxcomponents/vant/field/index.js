@@ -4,7 +4,8 @@ import { commonProps, inputProps, textareaProps } from './props';
 VantComponent({
     field: true,
     classes: ['input-class', 'right-icon-class', 'label-class'],
-    props: Object.assign(Object.assign(Object.assign(Object.assign({}, commonProps), inputProps), textareaProps), { size: String, icon: String, label: String, error: Boolean, center: Boolean, isLink: Boolean, leftIcon: String, rightIcon: String, autosize: null, required: Boolean, iconClass: String, clickable: Boolean, inputAlign: String, customStyle: String, errorMessage: String, arrowDirection: String, showWordLimit: Boolean, errorMessageAlign: String, readonly: {
+    props: Object.assign(Object.assign(Object.assign(Object.assign({}, commonProps), inputProps), textareaProps), {
+        size: String, icon: String, label: String, error: Boolean, center: Boolean, isLink: Boolean, leftIcon: String, rightIcon: String, autosize: null, required: Boolean, iconClass: String, clickable: Boolean, inputAlign: String, customStyle: String, errorMessage: String, arrowDirection: String, showWordLimit: Boolean, errorMessageAlign: String, readonly: {
             type: Boolean,
             observer: 'setShowClear',
         }, clearable: {
@@ -25,7 +26,8 @@ VantComponent({
         }, extraEventParams: {
             type: Boolean,
             value: false,
-        } }),
+        }
+    }),
     data: {
         focused: false,
         innerValue: '',
@@ -89,7 +91,7 @@ VantComponent({
         },
         emitChange(detail) {
             const { extraEventParams } = this.data;
-            this.setData({ value: detail.value });
+            this.setData({ value: detail.value, innerValue: detail.value });
             nextTick(() => {
                 const data = extraEventParams ? detail : detail.value;
                 this.$emit('input', data);
@@ -109,4 +111,9 @@ VantComponent({
         },
         noop() { },
     },
+    watch: {
+        value: function (val) {
+            this.setData({ innerValue: val });
+        }
+    }
 });
