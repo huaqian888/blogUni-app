@@ -77,11 +77,10 @@ const loginAndRegister = () => {
         uni.navigateBack()
       } else {
         uni.showToast({
-          title: '登录/注册失败, 请重新输入账号密码',
+          title: '注册/登录失败',
           icon: 'error',
           mask: true,
         })
-        userName.value = ''
         passwd.value = ''
       }
     })

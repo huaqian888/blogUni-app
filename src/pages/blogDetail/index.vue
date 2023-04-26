@@ -1,5 +1,5 @@
 <template>
-  <div class="blogDetail padding-sm">
+  <div class="blogDetail padding-lg">
     <van-skeleton title avatar row="3" :loading="loading">
       <div>
         <div class="title">{{ blogInfo.blogTitle }}</div>
@@ -16,10 +16,7 @@
             </div>
           </div>
         </div>
-        <div
-          class="cover"
-          v-if="blogInfo.blogCover && !blogInfo.blogCover.includes('default')"
-        >
+        <div class="cover">
           <img
             class="preload"
             :src="blogInfo.blogCover"
@@ -37,17 +34,46 @@
       </div>
     </van-skeleton>
   </div>
+  <div
+    class="comment-anchor"
+    style="
+      padding: 12px;
+      color: #868e96;
+      background-color: #fff;
+      border-top: 6px solid #f0f0f0;
+    "
+  >
+    {{ commentList.length }} 回复
+  </div>
+  <comment-area :comment-list="commentList"></comment-area>
   <div class="toolbar">
     <van-field
       type="text"
       placeholder="输入评论..."
       center
-      custom-style="background-color: #f0f0f0; border-radius: 16px; height: 29px; width: 320px"
+      :custom-style="inputStyle"
+      :value="comment"
+      @change="(v: any)=>comment =  v.detail"
+      @focus="showComment = true"
+      @blur="showComment = false"
     />
-    <div class="tools flex">
+    <div class="tools flex" v-show="!showComment">
       <van-icon name="bars" size="24px" @click="showNav = true" />
-      <van-icon name="chat-o" size="24px" />
+      <van-icon
+        name="chat-o"
+        size="24px"
+        v-show="showCommentIcon"
+        :info="commentList.length"
+        @click="transformPosition"
+      />
+      <van-icon
+        v-show="!showCommentIcon"
+        name="description"
+        size="24px"
+        @click="transformPosition(false)"
+      />
     </div>
+    <div v-show="showComment" @click="leaveMessage">发布</div>
   </div>
   <div style="padding: 23px"></div>
   <view catchtouchmove="banScroll">
@@ -73,10 +99,13 @@
 <script lang="ts" setup>
 import { queryBlogDetails } from '@/api/controller/blog'
 import type { BlogDTO } from '@/api/dto'
+import commentArea from '@/components/commentArea/index.vue'
 import { getTimegap } from '@/utils/date'
-import { onLoad, onPageScroll, onReady } from '@dcloudio/uni-app'
+import { onLoad, onPageScroll, onReachBottom, onReady } from '@dcloudio/uni-app'
 import { getCurrentInstance, reactive, computed, ref } from 'vue'
 import list from './components/list/index.vue'
+import { queryComments, releaseComment } from '@/api/controller/comment'
+import type { CommentVO } from '@/api/vo'
 
 type NavItem = {
   title: string
@@ -89,6 +118,18 @@ let instance = getCurrentInstance()
 let topGap: number = 0
 onPageScroll((v: any) => {
   topGap = v.scrollTop
+  if (
+    commentFixPosition >
+    v.scrollTop + uni.getWindowInfo().screenHeight - 120
+  ) {
+    showCommentIcon.value = true
+    contentPosition = v.scrollTop
+  } else {
+    showCommentIcon.value = false
+    if (commentFixPosition <= v.scrollTop) {
+      commentPosition = v.scrollTop
+    }
+  }
 })
 
 const initSelected = async () => {
@@ -119,6 +160,7 @@ onLoad((option: any) => {
     Object.assign(blogInfo, res)
     loading.value = false
   })
+  queryCommentList()
 })
 const parseMd = computed(() => (str: string) => {
   if (str) {
@@ -132,6 +174,17 @@ const showCover = ref('hidden')
 const coverHeight = ref()
 const showNav = ref(false)
 const navList = reactive<NavItem[]>([])
+const showComment = ref(false)
+const showCommentIcon = ref(true)
+let contentPosition = 0
+let commentFixPosition = 0
+let commentPosition = 0
+const inputStyle = computed(() => {
+  return `background-color: #f0f0f0;border-radius: 16px;height: 29px;width: ${
+    showComment.value ? '360px' : '320px'
+  };`
+})
+const comment = ref('')
 const initNavList = (str: string) => {
   let arr = str.split('\n')
   arr = arr.filter((v) => v.startsWith('#'))
@@ -155,9 +208,9 @@ const preLoadImg = () => {
       .select('.preload')
       .boundingClientRect((v) => {
         uni.getImageInfo({
-          src: (v as any).dataset.src,
+          src: (v as any)?.dataset.src,
           success: function (image) {
-            coverHeight.value = image.height
+            coverHeight.value = (image.height * image.width) / 406
             instance?.proxy?.$nextTick(() => {
               showCover.value = 'visible'
               resolve()
@@ -196,20 +249,98 @@ const toTarget = (top: number, key: number) => {
     uni.pageScrollTo({ scrollTop: top, duration: 300 })
   }
 }
+const transformPosition = (toComment: boolean = true) => {
+  uni
+    .createSelectorQuery()
+    .in(instance)
+    .select('.blogDetail')
+    .boundingClientRect((data: any) => {
+      uni
+        .createSelectorQuery()
+        .in(instance)
+        .select('.comment-anchor')
+        .boundingClientRect((anchor: any) => {
+          uni.pageScrollTo({
+            scrollTop: toComment ? commentPosition : contentPosition,
+            duration: 0,
+          })
+        })
+        .exec()
+    })
+    .exec()
+}
+const commentList = reactive<CommentVO.commentInfo[]>([])
+const itemCount = ref()
+const param = {
+  limit: 10,
+  pageOffset: 1,
+}
+const queryCommentList = () => {
+  queryComments({
+    blogId: blogInfo.blogId,
+    ...param,
+  }).then((res: any) => {
+    itemCount.value = res.count
+    commentList.push(...res.blogMainComments)
+  })
+}
+const leaveMessage = () => {
+  uni.getStorage({
+    key: 'userId',
+    success: (res: any) => {
+      releaseComment({
+        blogId: blogInfo.blogId,
+        commentDate: new Date().toLocaleDateString(),
+        commentatorId: res.data,
+        commentContent: comment.value,
+      }).then(() => {
+        uni.showToast({
+          title: '发布成功',
+          icon: 'none',
+        })
+        commentList.length = 0
+        comment.value = ''
+        param.pageOffset = 1
+        queryCommentList()
+      })
+    },
+    fail: () => {
+      uni.showToast({
+        icon: 'error',
+        title: '登录后可留言',
+      })
+    },
+  })
+}
+onReachBottom(() => {
+  if (commentList.length < itemCount.value) {
+    param.pageOffset++
+    queryCommentList()
+  }
+})
+
 onReady(async () => {
   initNavList(blogInfo.blogContent)
   await preLoadImg()
   setTimeout(async () => {
     await initTop(1)
   }, 500)
+  uni
+    .createSelectorQuery()
+    .in(instance)
+    .select('.comment-anchor')
+    .boundingClientRect((anchor: any) => {
+      commentFixPosition = anchor.top
+      commentPosition = anchor.top
+    })
+    .exec()
 })
 </script>
 
 <style scoped>
 .blogDetail {
   background-color: #fff;
-  height: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh - 46px);
 }
 
 .title {
@@ -247,6 +378,7 @@ onReady(async () => {
   display: flex;
   border-top: 1px solid #f0f0f0;
   justify-content: space-between;
+  align-items: center;
   background-color: #fff;
 }
 

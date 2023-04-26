@@ -13,7 +13,6 @@
       </div>
     </div>
   </div>
-  {{ updateName }}
   <van-action-sheet
     title="修改账号"
     :round="false"

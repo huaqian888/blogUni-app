@@ -1,9 +1,11 @@
 export namespace PersonalVO {
   export interface userInfo {
-    userName?: string
+    userName: string
 
-    userId?: number
+    userId: number
 
-    userAvatar?: string
+    userAvatar: string
+
+    userType?: number
   }
 }

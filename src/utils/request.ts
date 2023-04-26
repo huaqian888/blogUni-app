@@ -32,9 +32,7 @@ export const createAxios = (configs?: AxiosRequestConfig) => {
       }
       return config.data
     },
-    (err) => {
-      console.log(2)
-    }
+    (err) => {}
   )
 
   return instance

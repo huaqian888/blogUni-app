@@ -64,7 +64,7 @@
 import { storeToRefs } from 'pinia'
 import { useBlogStore } from '../../../../store/blog/index'
 import { ref } from 'vue'
-import { onReachBottom, onPullDownRefresh } from '@dcloudio/uni-app'
+import { onReachBottom } from '@dcloudio/uni-app'
 import { listBlog } from '@/api/controller/blog'
 
 const blogStore = useBlogStore()

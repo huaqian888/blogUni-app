@@ -20,8 +20,8 @@
       <div class="flex about">
         <div class="text-bold">{{ bloggerInfo.userName }}</div>
         <div style="font-size: 12px; line-height: 2">
-          不知名高校小前端开发攻城刻师，立志向全浅攻城师看齐
-          的算法小白，欢迎大佬们看看蒟蒻de小博客=v=!
+          不知名前端开发攻城师，立志向全栈攻城师看齐
+          的算法小白，欢迎大佬们看看蒟蒻de小博客
         </div>
       </div>
     </div>
